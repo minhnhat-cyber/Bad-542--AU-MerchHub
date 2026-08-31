@@ -1,0 +1,36 @@
+services:
+  database:
+    image: mysql:8.4
+    container_name: au-merchhub-database
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    ports:
+      - "127.0.0.1:3308:3306"
+
+    volumes:
+      - au-merchhub-database-data:/var/lib/mysql
+
+    networks:
+      - au-merchhub-network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  au-merchhub-network:
+
+volumes:
+  au-merchhub-database-data:
