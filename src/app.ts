@@ -1,3 +1,4 @@
+import { productRouter } from "./routes/products.routes.js";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -11,6 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/categories", categoryRouter);
+// Product routes
+app.use("/api/products", productRouter);
 
 app.get("/api/health", async (_request, response) => {
   try {

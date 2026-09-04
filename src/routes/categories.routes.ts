@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import {
@@ -10,9 +9,11 @@ import { z } from "zod";
 
 export const categoryRouter = Router();
 
+// Creates a new category
 categoryRouter.post("/", async (request, response) => {
   const parsedBody = createCategorySchema.safeParse(request.body);
 
+  // Reject invalid request data
   if (!parsedBody.success) {
     return response.status(400).json({
       success: false,
@@ -32,8 +33,11 @@ categoryRouter.post("/", async (request, response) => {
       data: category,
     });
   } catch (error) {
+    // Handles duplicate category names
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
       error.code === "P2002"
     ) {
       return response.status(409).json({
@@ -46,6 +50,7 @@ categoryRouter.post("/", async (request, response) => {
   }
 });
 
+// Gets all categories
 categoryRouter.get("/", async (_request, response) => {
   const categories = await prisma.category.findMany({
     orderBy: {
@@ -59,23 +64,26 @@ categoryRouter.get("/", async (_request, response) => {
   });
 });
 
+// Updates an existing category
 categoryRouter.patch("/:id", async (request, response) => {
   const parsedParams = categoryIdSchema.safeParse(request.params);
   const parsedBody = updateCategorySchema.safeParse(request.body);
 
-if (!parsedParams.success) {
-  return response.status(400).json({
-    success: false,
-    error: z.treeifyError(parsedParams.error),
-  });
-}
+  // Validates category ID
+  if (!parsedParams.success) {
+    return response.status(400).json({
+      success: false,
+      error: z.treeifyError(parsedParams.error),
+    });
+  }
 
-if (!parsedBody.success) {
-  return response.status(400).json({
-    success: false,
-    error: z.treeifyError(parsedBody.error),
-  });
-}
+  // Validates updated category data
+  if (!parsedBody.success) {
+    return response.status(400).json({
+      success: false,
+      error: z.treeifyError(parsedBody.error),
+    });
+  }
 
   try {
     const category = await prisma.category.update({
@@ -92,8 +100,11 @@ if (!parsedBody.success) {
       data: category,
     });
   } catch (error) {
+    // Handles a category ID that does not exist
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
       error.code === "P2025"
     ) {
       return response.status(404).json({
@@ -102,8 +113,11 @@ if (!parsedBody.success) {
       });
     }
 
+    // Handles duplicate category names
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
       error.code === "P2002"
     ) {
       return response.status(409).json({
@@ -116,9 +130,11 @@ if (!parsedBody.success) {
   }
 });
 
+// Deletes a category
 categoryRouter.delete("/:id", async (request, response) => {
   const parsedParams = categoryIdSchema.safeParse(request.params);
 
+  // Validates category ID
   if (!parsedParams.success) {
     return response.status(400).json({
       success: false,
@@ -135,8 +151,11 @@ categoryRouter.delete("/:id", async (request, response) => {
 
     return response.status(204).send();
   } catch (error) {
+    // Handles a category ID that does not exist
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
       error.code === "P2025"
     ) {
       return response.status(404).json({
@@ -145,8 +164,11 @@ categoryRouter.delete("/:id", async (request, response) => {
       });
     }
 
+    // Prevents deleting categories that still contain products
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
       error.code === "P2003"
     ) {
       return response.status(409).json({
