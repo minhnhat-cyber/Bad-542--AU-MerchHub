@@ -2,7 +2,9 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { prisma } from "./lib/prisma.js";
+import { authRouter } from "./routes/auth.routes.js";
 import { categoryRouter } from "./routes/categories.routes.js";
+import { orderRouter } from "./routes/orders.routes.js";
 
 export const app = express();
 
@@ -10,7 +12,9 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+app.use("/api/auth", authRouter);
 app.use("/api/categories", categoryRouter);
+app.use("/api/orders", orderRouter);
 
 app.get("/api/health", async (_request, response) => {
   try {
@@ -36,3 +40,18 @@ app.use((_request, response) => {
     error: "Route not found",
   });
 });
+
+app.use(
+  (
+    error: unknown,
+    _request: express.Request,
+    response: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    console.error(error);
+    response.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  },
+);
