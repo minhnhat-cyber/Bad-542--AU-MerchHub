@@ -5,6 +5,7 @@ import { prisma } from "./lib/prisma.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { categoryRouter } from "./routes/categories.routes.js";
 import { orderRouter } from "./routes/orders.routes.js";
+import { productRouter } from "./routes/products.routes.js";
 
 export const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/products", productRouter);
 
 app.get("/api/health", async (_request, response) => {
   try {
