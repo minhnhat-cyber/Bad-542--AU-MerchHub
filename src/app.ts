@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { prisma } from "./lib/prisma.js";
+import { adminRouter } from "./routes/admin.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { categoryRouter } from "./routes/categories.routes.js";
 import { orderRouter } from "./routes/orders.routes.js";
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/products", productRouter);

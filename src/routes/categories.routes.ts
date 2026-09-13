@@ -17,7 +17,7 @@ export const categoryRouter = Router();
 categoryRouter.post(
   "/",
   requireAuth,
-  requireRoles(Role.STAFF, Role.ADMIN),
+  requireRoles(Role.ADMIN),
   async (request, response) => {
     const parsedBody = createCategorySchema.safeParse(request.body);
 
@@ -71,7 +71,7 @@ categoryRouter.get("/", async (_request, response) => {
 categoryRouter.patch(
   "/:id",
   requireAuth,
-  requireRoles(Role.STAFF, Role.ADMIN),
+  requireRoles(Role.ADMIN),
   async (request, response) => {
     const parsedParams = categoryIdSchema.safeParse(request.params);
     const parsedBody = updateCategorySchema.safeParse(request.body);
@@ -133,7 +133,7 @@ categoryRouter.patch(
 categoryRouter.delete(
   "/:id",
   requireAuth,
-  requireRoles(Role.STAFF, Role.ADMIN),
+  requireRoles(Role.ADMIN),
   async (request, response) => {
     const parsedParams = categoryIdSchema.safeParse(request.params);
 
