@@ -1,6 +1,11 @@
-import { app } from "./app.js";
 import { env } from "./config/env.js";
-import { prisma } from "./lib/prisma.js";
+
+// In production, importing env waits for Azure Key Vault. Only initialize
+// Prisma and the Express dependency graph after DATABASE_URL is available.
+const [{ app }, { prisma }] = await Promise.all([
+  import("./app.js"),
+  import("./lib/prisma.js"),
+]);
 
 const server = app.listen(env.PORT, env.HOST, () => {
   console.log(
