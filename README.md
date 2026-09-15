@@ -1,6 +1,6 @@
 # AU MerchHub
 
-Express/Prisma backend for AU merchandise.
+Production-oriented Express/Prisma backend for AU merchandise.
 
 The React frontend is maintained separately at
 `https://github.com/ShramanShakya/AUHUB` in its `frontend` directory.
@@ -42,3 +42,16 @@ Admin-only endpoints:
 - API health: `http://127.0.0.1:3000/api/health`
 - Backend build: `npm run build`
 - AI description endpoint: `POST /api/products/generate-description`
+
+## Production architecture
+
+Production uses Docker, Nginx, HTTPS, Microsoft Entra ID, MySQL/Prisma, Gemini,
+and Azure Key Vault. No production secret is read from a local `.env` file.
+
+- [Design, architecture, RBAC, and ERD](docs/DESIGN.md)
+- [API summary](docs/API.md)
+- [Production deployment and hardening](docs/DEPLOYMENT.md)
+
+The production URL prefixes are `/merchhub/` for the frontend and
+`/merchhub-api/api/` for this API. They do not replace existing `/content` or
+`/api` routes.

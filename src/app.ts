@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
 import { adminRouter } from "./routes/admin.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
@@ -11,7 +12,15 @@ import { productRouter } from "./routes/products.routes.js";
 export const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+app.use(
+  cors({
+    origin: env.CORS_ORIGINS.split(",")
+      .map((origin) => origin.trim().replace(/\/+$/, ""))
+      .filter(Boolean),
+  }),
+);
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
