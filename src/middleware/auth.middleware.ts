@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import type { Role } from "@prisma/client";
+import { prisma } from "../lib/prisma.js";
 import {
   AuthError,
   verifyApplicationToken,
@@ -18,7 +19,25 @@ export const requireAuth: RequestHandler = async (request, response, next) => {
   }
 
   try {
-    request.auth = await verifyApplicationToken(match[1]);
+    const tokenClaims = await verifyApplicationToken(match[1]);
+    const user = await prisma.user.findUnique({
+      where: { id: tokenClaims.userId },
+      select: { email: true, role: true },
+    });
+
+    if (!user) {
+      response.status(401).json({
+        success: false,
+        error: "The signed-in user no longer exists",
+      });
+      return;
+    }
+
+    request.auth = {
+      userId: tokenClaims.userId,
+      email: user.email,
+      role: user.role,
+    };
     next();
   } catch (error) {
     if (error instanceof AuthError) {

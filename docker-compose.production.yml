@@ -1,0 +1,38 @@
+services:
+  migrate:
+    build:
+      context: .
+      target: runtime
+    command: ["node", "dist/migrate.js"]
+    network_mode: host
+    environment: &production-environment
+      NODE_ENV: production
+      HOST: 127.0.0.1
+      PORT: 3001
+      KEY_VAULT_URL: ${KEY_VAULT_URL}
+      # Required when the host is outside Azure. Leave unset only when the
+      # workload has an Azure managed identity.
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-}
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID}
+      MICROSOFT_ALLOWED_EMAIL_DOMAIN: ${MICROSOFT_ALLOWED_EMAIL_DOMAIN}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      APP_JWT_ISSUER: au-merchhub
+      APP_JWT_AUDIENCE: au-merchhub-api
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      target: runtime
+    environment: *production-environment
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

@@ -1,6 +1,6 @@
 # AU MerchHub
 
-Express/Prisma backend for AU merchandise.
+Production-oriented Express/Prisma backend for AU merchandise.
 
 The React frontend is maintained separately at
 `https://github.com/ShramanShakya/AUHUB` in its `frontend` directory.
@@ -23,8 +23,35 @@ The separate frontend development server proxies `/api` to
 `http://localhost:5173` as a Single-page application redirect URI.
 New accounts are students by default. Promote staff accounts by setting their `users.role` value to `STAFF` or `ADMIN` in the database.
 
+## Role permissions
+
+- `STUDENT`: browse products, place orders, and view personal orders.
+- `STAFF`: create/deactivate products, generate descriptions, and process orders.
+- `ADMIN`: all staff permissions plus category management and user role management.
+
+Role changes are enforced by the API immediately. A user who is already signed in
+should reload the frontend so its navigation reflects the new role.
+
+Admin-only endpoints:
+
+- `GET /api/admin/users`
+- `PATCH /api/admin/users/:id/role`
+
 ## Checks
 
 - API health: `http://127.0.0.1:3000/api/health`
 - Backend build: `npm run build`
 - AI description endpoint: `POST /api/products/generate-description`
+
+## Production architecture
+
+Production uses Docker, Nginx, HTTPS, Microsoft Entra ID, MySQL/Prisma, Gemini,
+and Azure Key Vault. No production secret is read from a local `.env` file.
+
+- [Design, architecture, RBAC, and ERD](docs/DESIGN.md)
+- [API summary](docs/API.md)
+- [Production deployment and hardening](docs/DEPLOYMENT.md)
+
+The production URL prefixes are `/merchhub/` for the frontend and
+`/merchhub-api/api/` for this API. They do not replace existing `/content` or
+`/api` routes.
